@@ -1,0 +1,68 @@
+{
+  "type": "module",
+  "name": "@damarkuncoro/agnostic-ui-theme-core",
+  "version": "1.0.0",
+  "description": "Theme core for Agnostic UI",
+
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+
+  "exports": {
+    ".": {
+      "types": "./lib/index.d.ts",
+      "import": "./lib/index.js"
+    }
+  },
+
+  "publishConfig": {
+    "access": "public"
+  },
+
+  "sideEffects": false,
+
+  "engines": {
+    "node": ">=18"
+  },
+
+  "files": [
+    "lib",
+    "README.md"
+  ],
+
+  "scripts": {
+    "build": "tsc",
+    "prepublishOnly": "npm run build"
+  },
+
+  "keywords": [
+    "ui",
+    "design-system",
+    "typescript",
+    "contracts",
+    "agnostic"
+  ],
+
+  "author": "Agnostic UI Team",
+  "license": "MIT",
+
+  "dependencies": {
+    "@damarkuncoro/agnostic-ui-contract-core": "^1.0.0"
+  },
+
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  },
+
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/damarkuncoro/agnostic-ui-contract-button"
+  },
+
+  "bugs": {
+    "url": "https://github.com/damarkuncoro/agnostic-ui-contract-button/issues"
+  },
+
+  "homepage": "https://github.com/damarkuncoro/agnostic-ui-contract-button#readme",
+
+  "packageManager": "pnpm@10.26.0+sha512.3b3f6c725ebe712506c0ab1ad4133cf86b1f4b687effce62a9b38b4d72e3954242e643190fc51fa1642949c735f403debd44f5cb0edd657abe63a8b6a7e1e402"
+}
