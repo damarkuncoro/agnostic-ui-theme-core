@@ -1,1 +1,0 @@
-{"version":3,"file":"focus.d.ts","sourceRoot":"","sources":["../../src/a11y/focus.ts"],"names":[],"mappings":"AAEA,MAAM,WAAW,iBAAiB;IAChC,kCAAkC;IAClC,SAAS,CAAC,EAAE,OAAO,CAAA;IAEnB,wCAAwC;IACxC,OAAO,CAAC,EAAE,OAAO,CAAA;IAEjB,iCAAiC;IACjC,IAAI,CAAC,EAAE,OAAO,CAAA;IAEd,0BAA0B;IAC1B,IAAI,CAAC,EAAE,OAAO,CAAA;CACf"}

@@ -1,1 +1,0 @@
-{"version":3,"file":"loading.d.ts","sourceRoot":"","sources":["../../../src/tokens/extended/loading.ts"],"names":[],"mappings":"AAEA,OAAO,KAAK,EAAE,oBAAoB,EAAE,MAAM,SAAS,CAAA;AAEnD,MAAM,WAAW,eAAgB,SAAQ,oBAAoB;IAC3D,WAAW,EAAE;QACX,EAAE,EAAE,MAAM,CAAA;QACV,EAAE,EAAE,MAAM,CAAA;QACV,EAAE,EAAE,MAAM,CAAA;KACX,CAAA;IAED,cAAc,EAAE,MAAM,CAAA;CACvB"}

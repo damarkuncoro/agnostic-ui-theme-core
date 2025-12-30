@@ -1,1 +1,0 @@
-{"version":3,"file":"resolve-responsive.js","sourceRoot":"","sources":["../../src/resolver/resolve-responsive.ts"],"names":[],"mappings":";AAAA,qCAAqC;;AAErC,8CAYC;AAZD,SAAgB,iBAAiB,CAC/B,KAAc,EACd,IAA0B;IAE1B,IAAI,IAAI,KAAK,QAAQ,EAAE,CAAC;QACtB,OAAO,KAAK,CAAA;IACd,CAAC;IAED,oBAAoB;IACpB,2DAA2D;IAE3D,OAAO,KAAK,CAAA;AACd,CAAC"}

@@ -1,1 +1,0 @@
-{"version":3,"file":"print.d.ts","sourceRoot":"","sources":["../../../src/tokens/extended/print.ts"],"names":[],"mappings":"AAEA,OAAO,KAAK,EAAE,oBAAoB,EAAE,MAAM,SAAS,CAAA;AAEnD,MAAM,WAAW,aAAc,SAAQ,oBAAoB;IACzD,MAAM,EAAE,MAAM,CAAA;IACd,UAAU,EAAE,MAAM,CAAA;IAClB,SAAS,EAAE,MAAM,CAAA;IACjB,SAAS,EAAE,OAAO,CAAA;CACnB"}

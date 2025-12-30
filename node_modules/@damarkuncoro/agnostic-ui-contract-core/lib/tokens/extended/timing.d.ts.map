@@ -1,1 +1,0 @@
-{"version":3,"file":"timing.d.ts","sourceRoot":"","sources":["../../../src/tokens/extended/timing.ts"],"names":[],"mappings":"AAEA,OAAO,KAAK,EAAmB,oBAAoB,EAAE,MAAM,SAAS,CAAA;AAEpE,MAAM,WAAW,cAAe,SAAQ,oBAAoB;IAC1D,OAAO,EAAE,MAAM,CAAA;IACf,IAAI,EAAE,MAAM,CAAA;IACZ,MAAM,EAAE,MAAM,CAAA;IACd,IAAI,EAAE,MAAM,CAAA;CACb"}

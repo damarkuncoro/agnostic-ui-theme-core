@@ -1,1 +1,0 @@
-{"version":3,"file":"interaction.d.ts","sourceRoot":"","sources":["../../../src/tokens/extended/interaction.ts"],"names":[],"mappings":"AAEA,OAAO,KAAK,EAAE,oBAAoB,EAAE,MAAM,SAAS,CAAA;AAEnD,MAAM,WAAW,mBAAoB,SAAQ,oBAAoB;IAC/D,OAAO,EAAE;QACP,GAAG,EAAE,MAAM,CAAA;KACZ,CAAA;IAED,SAAS,EAAE;QACT,KAAK,EAAE,MAAM,CAAA;QACb,MAAM,EAAE,MAAM,CAAA;KACf,CAAA;CACF"}
