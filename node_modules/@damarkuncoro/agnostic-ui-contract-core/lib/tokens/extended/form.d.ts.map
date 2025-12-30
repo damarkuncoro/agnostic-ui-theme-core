@@ -1,0 +1,1 @@
+{"version":3,"file":"form.d.ts","sourceRoot":"","sources":["../../../src/tokens/extended/form.ts"],"names":[],"mappings":"AAEA,OAAO,KAAK,EAAE,oBAAoB,EAAE,MAAM,SAAS,CAAA;AAEnD,MAAM,WAAW,YAAa,SAAQ,oBAAoB;IACxD,YAAY,EAAE,MAAM,CAAA;IACpB,YAAY,EAAE,MAAM,CAAA;IAEpB,aAAa,EAAE;QACb,EAAE,EAAE,MAAM,CAAA;QACV,EAAE,EAAE,MAAM,CAAA;QACV,EAAE,EAAE,MAAM,CAAA;KACX,CAAA;CACF"}

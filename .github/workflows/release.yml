@@ -29,6 +29,11 @@ jobs:
           TARBALL=$(npm pack)
           echo "tarball=$TARBALL" >> "$GITHUB_OUTPUT"
 
+      - name: Publish to NPM
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:

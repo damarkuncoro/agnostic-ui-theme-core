@@ -1,0 +1,1 @@
+{"version":3,"file":"resolve-theme.d.ts","sourceRoot":"","sources":["../../src/resolver/resolve-theme.ts"],"names":[],"mappings":"AAEA,OAAO,KAAK,EAAE,OAAO,EAAE,MAAM,UAAU,CAAA;AACvC,OAAO,KAAK,EAAE,gBAAgB,EAAE,MAAM,SAAS,CAAA;AAK/C,wBAAgB,YAAY,CAC1B,KAAK,EAAE,OAAO,EACd,OAAO,GAAE,gBAAqB,GAC7B,OAAO,CAyCT"}

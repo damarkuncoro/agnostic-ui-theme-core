@@ -1,0 +1,1 @@
+{"version":3,"file":"resolve-ref.js","sourceRoot":"","sources":["../../src/resolver/resolve-ref.ts"],"names":[],"mappings":";AAAA,8BAA8B;;AAI9B,gCAaC;AAbD,SAAgB,UAAU,CACxB,KAAmB,EACnB,MAAgC;IAEhC,IACE,OAAO,KAAK,KAAK,QAAQ;QACzB,KAAK,KAAK,IAAI;QACd,KAAK,IAAI,KAAK,EACd,CAAC;QACD,OAAO,MAAM,CAAC,KAAK,CAAC,GAAG,CAAC,CAAA;IAC1B,CAAC;IAED,OAAO,KAAK,CAAA;AACd,CAAC"}
