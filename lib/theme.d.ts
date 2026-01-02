@@ -1,6 +1,6 @@
-import type { UiCoreTokens, UiExtendedTokens } from "@damarkuncoro/agnostic-ui-contract-core";
+import type { UiCoreTokens, UiExtendedTokens, UiThemeVersion } from "../../agnostic-ui-contract-core/lib";
 export interface UiTheme {
-    version: "2.1";
+    version: UiThemeVersion;
     tokens: UiCoreTokens & Partial<UiExtendedTokens>;
 }
 //# sourceMappingURL=theme.d.ts.map

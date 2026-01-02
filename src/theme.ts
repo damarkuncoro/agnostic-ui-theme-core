@@ -1,11 +1,12 @@
 // packages/agnostic-ui-theme-core/src/theme.ts
-import type { 
-    UiCoreTokens, 
-    UiExtendedTokens } 
-    from "@damarkuncoro/agnostic-ui-contract-core"
+import type {
+    UiCoreTokens,
+    UiExtendedTokens,
+    UiThemeVersion
+} from "../../agnostic-ui-contract-core/lib"
 
 
 export interface UiTheme {
-  version: "2.1"
+  version: UiThemeVersion
   tokens: UiCoreTokens & Partial<UiExtendedTokens>
 }
