@@ -36,7 +36,7 @@
   "author": "Agnostic UI Team",
   "license": "MIT",
   "dependencies": {
-    "@damarkuncoro/agnostic-ui-contract-core": "file:../agnostic-ui-contract-core"
+    "@damarkuncoro/agnostic-ui-contract-core": "file:../../packages/agnostic-ui-contract-core"
   },
   "devDependencies": {
     "typescript": "^5.0.0"
