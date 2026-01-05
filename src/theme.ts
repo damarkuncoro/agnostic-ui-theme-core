@@ -3,7 +3,7 @@ import type {
     UiCoreTokens,
     UiExtendedTokens,
     UiThemeVersion
-} from "../../agnostic-ui-contract-core/lib"
+} from "../../../packages/agnostic-ui-contract-core/lib"
 
 
 export interface UiTheme {
