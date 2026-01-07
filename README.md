@@ -233,6 +233,53 @@ const customTheme = createTheme({
 
 **🏛️ DDD SOLID DRY theme-core with enterprise excellence! 🚀✨**
 
+## 🔗 **Hubungan dengan `agnostic-ui-utils-theme`**
+
+Package ini bekerja **sama-sama** dengan `@damarkuncoro/agnostic-ui-utils-theme` dalam ekosistem tema Agnostic UI:
+
+### **📊 Arsitektur Hierarki**
+```
+🎨 theme-core (Foundation Layer)
+├── 🎯 Token Management & Construction
+├── 🏭 Theme Building Services
+└── ✅ Theme Validation & Business Rules
+
+🎭 utils-theme (Operations Layer) ← depends on theme-core
+├── 🔄 Theme Operations & Merging
+├── 🏭 Theme Manipulation Use Cases
+└── 📊 Theme Lifecycle Management
+```
+
+### **🔄 Collaboration Pattern**
+```typescript
+// 1. theme-core membuat fondasi tema
+import { ThemeBuilderService, getThemeBuilderService } from '@damarkuncoro/agnostic-ui-theme-core';
+const builder = getThemeBuilderService();
+const baseTheme = builder.buildTheme({
+  color: { palette: { primary: { 500: '#3b82f6' } } },
+  spacing: { scale: { md: '1rem' } },
+  typography: { fontSize: { base: '1rem' } }
+});
+
+// 2. utils-theme mengoperasikan tema tersebut
+import { Theme, getMergeThemesUseCase } from '@damarkuncoro/agnostic-ui-utils-theme';
+const dddTheme = Theme.create({
+  name: 'operational-theme',
+  tokens: baseTheme.toTokens() // dari theme-core
+});
+
+const merged = await getMergeThemesUseCase().execute({
+  targetTheme: dddTheme,
+  sourceThemes: [customizations]
+});
+```
+
+### **🎯 Separation of Concerns**
+- **`theme-core`**: "What tokens exist" (foundation & construction)
+- **`utils-theme`**: "How tokens are manipulated" (operations & lifecycle)
+
+---
+
 ## Installation
 
 ```bash
