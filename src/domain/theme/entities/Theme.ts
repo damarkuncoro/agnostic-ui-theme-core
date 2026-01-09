@@ -5,6 +5,8 @@ import { BackgroundColor } from "../../tokens/color/BackgroundColor";
 import { BorderColor } from "../../tokens/color/BorderColor";
 import { SpacingScale } from "../../tokens/spacing/SpacingScale";
 import { TypographyScale } from "../../tokens/typography/TypographyScale";
+import { ThemeConverter } from "./ThemeConverter";
+import { ComponentTokenService } from "./ComponentTokenService";
 
 /**
  * Theme version type
@@ -152,55 +154,7 @@ export class Theme {
       lineHeight: string;
     };
   } {
-    const componentConfigs = {
-      button: {
-        colors: {
-          primary: this.color.palette.getPrimary(),
-          secondary: this.color.palette.getSecondary(),
-          text: this.color.text.primary,
-          background: this.color.background.surface,
-          border: this.color.border.default
-        },
-        spacing: {
-          padding: this.spacing.getSpacingForSize("sm"),
-          margin: this.spacing.getSpacingForContext("margin"),
-          gap: this.spacing.getSpacingForContext("gap")
-        },
-        typography: this.typography.getTypographyForInteractive("button")
-      },
-      input: {
-        colors: {
-          primary: this.color.palette.getPrimary(),
-          secondary: this.color.palette.getSecondary(),
-          text: this.color.text.primary,
-          background: this.color.background.surface,
-          border: this.color.border.default
-        },
-        spacing: {
-          padding: this.spacing.getSpacingForSize("md"),
-          margin: this.spacing.getSpacingForContext("margin"),
-          gap: this.spacing.getSpacingForContext("gap")
-        },
-        typography: this.typography.getTypographyForInteractive("input")
-      },
-      card: {
-        colors: {
-          primary: this.color.palette.getPrimary(),
-          secondary: this.color.palette.getSecondary(),
-          text: this.color.text.primary,
-          background: this.color.background.elevated,
-          border: this.color.border.subtle
-        },
-        spacing: {
-          padding: this.spacing.getSpacingForSize("lg"),
-          margin: this.spacing.getSpacingForContext("margin"),
-          gap: this.spacing.getSpacingForContext("gap")
-        },
-        typography: this.typography.getTypographyForHierarchy("body")
-      }
-    };
-
-    return componentConfigs[componentType];
+    return ComponentTokenService.getTokensForComponent(this, componentType);
   }
 
   /**
@@ -297,34 +251,6 @@ export class Theme {
       zIndex: Record<string, string>;
     };
   } {
-    return {
-      version: this.version,
-      tokens: {
-        color: {
-          palette: this.color.palette.toObject(),
-          text: this.color.text.toObject(),
-          background: this.color.background.toObject(),
-          border: this.color.border.toObject()
-        },
-        spacing: this.spacing.toObject(),
-        typography: this.typography.toObject(),
-        shadow: {
-          sm: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
-          md: "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)",
-          lg: "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)",
-          xl: "0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)",
-          "2xl": "0 25px 50px -12px rgb(0 0 0 / 0.25)"
-        },
-        zIndex: {
-          0: "0",
-          10: "10",
-          20: "20",
-          30: "30",
-          40: "40",
-          50: "50",
-          auto: "auto"
-        }
-      }
-    };
+    return ThemeConverter.toUiTheme(this);
   }
 }
