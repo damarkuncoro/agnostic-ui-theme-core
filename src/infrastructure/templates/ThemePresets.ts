@@ -169,7 +169,7 @@ export class ThemePresets {
    * Creates a dark mode version of any preset
    */
   public static darkMode(preset: ThemeComposition): DarkModeTheme {
-    return DarkModeTheme.fromLightTheme(preset);
+    return DarkModeTheme.fromLightTheme(preset.getTheme());
   }
 
   /**

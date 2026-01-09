@@ -15,8 +15,9 @@ import './bootstrap'
 // Domain Layer
 export { Theme, UiThemeVersion } from './domain/theme/entities/Theme'
 export { DarkModeTheme } from './domain/theme/entities/DarkModeTheme'
-export { ThemeComposition, ThemeCompositionBuilder } from './domain/theme/entities/ThemeComposition'
-export type { ThemeExtension } from './domain/theme/entities/ThemeComposition'
+export { ThemeComposition } from './domain/theme/entities/ThemeComposition'
+export { ThemeCompositionBuilder } from './domain/theme/entities/ThemeCompositionBuilder'
+export type { ThemeExtension } from './domain/theme/entities/ThemeExtension'
 export { ColorPalette } from './domain/tokens/color/ColorPalette'
 export { TextColor } from './domain/tokens/color/TextColor'
 export { BackgroundColor } from './domain/tokens/color/BackgroundColor'
@@ -54,12 +55,17 @@ export {
 // =================================================================
 
 import { Theme, UiThemeVersion } from './domain/theme/entities/Theme'
+import { DarkModeTheme } from './domain/theme/entities/DarkModeTheme'
+import { ThemeComposition } from './domain/theme/entities/ThemeComposition'
 import { ColorPalette } from './domain/tokens/color/ColorPalette'
 import { TextColor } from './domain/tokens/color/TextColor'
 import { BackgroundColor } from './domain/tokens/color/BackgroundColor'
 import { BorderColor } from './domain/tokens/color/BorderColor'
 import { SpacingScale } from './domain/tokens/spacing/SpacingScale'
 import { TypographyScale } from './domain/tokens/typography/TypographyScale'
+import { MergeThemesUseCase } from './application/use-cases/MergeThemesUseCase'
+import { ThemePerformanceService } from './infrastructure/services/ThemePerformanceService'
+import { ThemePresets } from './infrastructure/templates/ThemePresets'
 import { getThemeBuilderService, getThemeValidatorService, getTokenBuilder } from './bootstrap'
 
 // Legacy theme interface (now powered by DDD)
@@ -250,7 +256,7 @@ export function createThemeFromPreset(presetName: string, customizations?: any):
   const preset = ThemePresets.createPreset(presetName);
 
   if (customizations) {
-    const extended = ThemeComposition.extend(preset, customizations);
+    const extended = ThemeComposition.extend(preset.getTheme(), customizations);
     return extended.toUiTheme();
   }
 

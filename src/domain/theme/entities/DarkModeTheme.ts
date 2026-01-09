@@ -12,34 +12,30 @@ import { TypographyScale } from '../../tokens/typography/TypographyScale';
  * Dark Mode Theme Entity
  * Specialized theme entity for dark mode with optimized color schemes
  */
-export class DarkModeTheme extends Theme {
+export class DarkModeTheme {
+  private theme: Theme;
   private lightTheme: Theme;
 
   constructor(
     lightTheme: Theme,
     darkOverrides?: Partial<{
       color: {
-        palette: Partial<ColorPalette>;
-        text: Partial<TextColor>;
-        background: Partial<BackgroundColor>;
-        border: Partial<BorderColor>;
+        palette: Partial<Record<string, Record<string, string>>>;
+        text: Partial<Record<string, string>>;
+        background: Partial<Record<string, string>>;
+        border: Partial<Record<string, string>>;
       };
-      spacing: Partial<SpacingScale>;
+      spacing: {
+        scale?: Record<string, string>;
+        semantic?: Record<string, string>;
+      };
       typography: Partial<TypographyScale>;
     }>
   ) {
-    // Start with light theme as base
-    super({
-      version: lightTheme.version,
-      color: lightTheme.color,
-      spacing: lightTheme.spacing,
-      typography: lightTheme.typography
-    });
-
     this.lightTheme = lightTheme;
 
     // Apply dark mode transformations
-    this.applyDarkModeTransformations(darkOverrides);
+    this.theme = this.applyDarkModeTransformations(lightTheme, darkOverrides);
   }
 
   /**
@@ -49,12 +45,15 @@ export class DarkModeTheme extends Theme {
     lightTheme: Theme,
     customizations?: Partial<{
       color: {
-        palette: Partial<ColorPalette>;
-        text: Partial<TextColor>;
-        background: Partial<BackgroundColor>;
-        border: Partial<BorderColor>;
+        palette: Partial<Record<string, Record<string, string>>>;
+        text: Partial<Record<string, string>>;
+        background: Partial<Record<string, string>>;
+        border: Partial<Record<string, string>>;
       };
-      spacing: Partial<SpacingScale>;
+      spacing: {
+        scale?: Record<string, string>;
+        semantic?: Record<string, string>;
+      };
       typography: Partial<TypographyScale>;
     }>
   ): DarkModeTheme {
@@ -65,51 +64,120 @@ export class DarkModeTheme extends Theme {
    * Applies dark mode color transformations
    */
   private applyDarkModeTransformations(
+    lightTheme: Theme,
     overrides?: Partial<{
       color: {
-        palette: Partial<ColorPalette>;
-        text: Partial<TextColor>;
-        background: Partial<BackgroundColor>;
-        border: Partial<BorderColor>;
+        palette: Partial<Record<string, Record<string, string>>>;
+        text: Partial<Record<string, string>>;
+        background: Partial<Record<string, string>>;
+        border: Partial<Record<string, string>>;
       };
       spacing: Partial<SpacingScale>;
       typography: Partial<TypographyScale>;
     }>
-  ): void {
+  ): Theme {
     // Transform colors for dark mode
-    this.transformColorsForDarkMode();
+    const transformedColors = this.transformColorsForDarkMode(lightTheme);
 
     // Apply custom overrides if provided
     if (overrides?.color?.palette) {
-      this.color.palette = { ...this.color.palette, ...overrides.color.palette };
+      // Merge palette overrides, filtering out undefined values
+      const paletteOverrides: Record<string, Record<string, string>> = {};
+      for (const [key, value] of Object.entries(overrides.color.palette)) {
+        if (value) {
+          paletteOverrides[key] = value;
+        }
+      }
+      transformedColors.palette = { ...transformedColors.palette, ...paletteOverrides };
     }
     if (overrides?.color?.text) {
-      this.color.text = { ...this.color.text, ...overrides.color.text };
+      // Merge text overrides, filtering out undefined values
+      const textOverrides: Record<string, string> = {};
+      for (const [key, value] of Object.entries(overrides.color.text)) {
+        if (value) {
+          textOverrides[key] = value;
+        }
+      }
+      transformedColors.text = { ...transformedColors.text, ...textOverrides };
     }
     if (overrides?.color?.background) {
-      this.color.background = { ...this.color.background, ...overrides.color.background };
+      // Merge background overrides, filtering out undefined values
+      const backgroundOverrides: Record<string, string> = {};
+      for (const [key, value] of Object.entries(overrides.color.background)) {
+        if (value) {
+          backgroundOverrides[key] = value;
+        }
+      }
+      transformedColors.background = { ...transformedColors.background, ...backgroundOverrides };
     }
     if (overrides?.color?.border) {
-      this.color.border = { ...this.color.border, ...overrides.color.border };
+      // Merge border overrides, filtering out undefined values
+      const borderOverrides: Record<string, string> = {};
+      for (const [key, value] of Object.entries(overrides.color.border)) {
+        if (value) {
+          borderOverrides[key] = value;
+        }
+      }
+      transformedColors.border = { ...transformedColors.border, ...borderOverrides };
     }
 
-    // Apply spacing and typography overrides
-    if (overrides?.spacing) {
-      this.spacing = { ...this.spacing, ...overrides.spacing };
-    }
-    if (overrides?.typography) {
-      this.typography = { ...this.typography, ...overrides.typography };
-    }
+    // Create new theme with transformed colors
+    return Theme.create({
+      version: lightTheme.version,
+      color: {
+        palette: ColorPalette.create({
+          neutral: transformedColors.palette.neutral || lightTheme.color.palette.toObject().neutral,
+          primary: transformedColors.palette.primary || lightTheme.color.palette.toObject().primary,
+          secondary: transformedColors.palette.secondary || lightTheme.color.palette.toObject().secondary
+        }),
+        text: TextColor.create({
+          primary: transformedColors.text.primary || lightTheme.color.text.toObject().primary,
+          secondary: transformedColors.text.secondary || lightTheme.color.text.toObject().secondary,
+          muted: transformedColors.text.muted || lightTheme.color.text.toObject().muted,
+          inverse: transformedColors.text.inverse || lightTheme.color.text.toObject().inverse,
+          disabled: transformedColors.text.disabled || lightTheme.color.text.toObject().disabled
+        }),
+        background: BackgroundColor.create({
+          surface: transformedColors.background.surface || lightTheme.color.background.toObject().surface,
+          elevated: transformedColors.background.elevated || lightTheme.color.background.toObject().elevated,
+          muted: transformedColors.background.muted || lightTheme.color.background.toObject().muted,
+          inverse: transformedColors.background.inverse || lightTheme.color.background.toObject().inverse
+        }),
+        border: BorderColor.create({
+          default: transformedColors.border.default || lightTheme.color.border.toObject().default,
+          subtle: transformedColors.border.subtle || lightTheme.color.border.toObject().subtle,
+          strong: transformedColors.border.strong || lightTheme.color.border.toObject().strong,
+          focus: transformedColors.border.focus || lightTheme.color.border.toObject().focus
+        })
+      },
+      spacing: overrides?.spacing ? SpacingScale.create({
+        scale: overrides.spacing.scale ? { ...lightTheme.spacing.scale, ...overrides.spacing.scale } : lightTheme.spacing.scale,
+        semantic: overrides.spacing.semantic ? { ...lightTheme.spacing.semantic, ...overrides.spacing.semantic } : lightTheme.spacing.semantic
+      }) : lightTheme.spacing,
+      typography: overrides?.typography ? TypographyScale.create({
+        fontSize: overrides.typography.fontSize ? { ...lightTheme.typography.fontSize, ...overrides.typography.fontSize } : lightTheme.typography.fontSize,
+        fontWeight: overrides.typography.fontWeight ? Object.fromEntries(
+          Object.entries({ ...lightTheme.typography.fontWeight, ...overrides.typography.fontWeight })
+            .map(([key, value]) => [key, String(value)])
+        ) : lightTheme.typography.fontWeight,
+        lineHeight: overrides.typography.lineHeight ? { ...lightTheme.typography.lineHeight, ...overrides.typography.lineHeight } : lightTheme.typography.lineHeight
+      }) : lightTheme.typography
+    });
   }
 
   /**
    * Transforms colors for optimal dark mode experience
    */
-  private transformColorsForDarkMode(): void {
+  private transformColorsForDarkMode(lightTheme: Theme): {
+    palette: Record<string, Record<string, string>>;
+    text: Record<string, string>;
+    background: Record<string, string>;
+    border: Record<string, string>;
+  } {
     // Transform palette colors
     const transformedPalette: Record<string, Record<string, string>> = {};
 
-    for (const [colorName, variants] of Object.entries(this.color.palette.toObject())) {
+    for (const [colorName, variants] of Object.entries(lightTheme.color.palette.toObject())) {
       transformedPalette[colorName] = {};
 
       for (const [variant, value] of Object.entries(variants)) {
@@ -118,37 +186,36 @@ export class DarkModeTheme extends Theme {
       }
     }
 
-    this.color.palette = ColorPalette.create(transformedPalette);
-
     // Transform text colors for dark backgrounds
-    const textColors = this.color.text.toObject();
+    const textColors = lightTheme.color.text.toObject();
     const transformedText: Record<string, string> = {};
 
     for (const [key, value] of Object.entries(textColors)) {
       transformedText[key] = this.transformTextColorForDarkMode(value, key);
     }
 
-    this.color.text = TextColor.create(transformedText);
-
     // Transform background colors
-    const bgColors = this.color.background.toObject();
+    const bgColors = lightTheme.color.background.toObject();
     const transformedBg: Record<string, string> = {};
 
     for (const [key, value] of Object.entries(bgColors)) {
       transformedBg[key] = this.transformBackgroundColorForDarkMode(value, key);
     }
 
-    this.color.background = BackgroundColor.create(transformedBg);
-
     // Transform border colors
-    const borderColors = this.color.border.toObject();
+    const borderColors = lightTheme.color.border.toObject();
     const transformedBorder: Record<string, string> = {};
 
     for (const [key, value] of Object.entries(borderColors)) {
       transformedBorder[key] = this.transformBorderColorForDarkMode(value, key);
     }
 
-    this.color.border = BorderColor.create(transformedBorder);
+    return {
+      palette: transformedPalette,
+      text: transformedText,
+      background: transformedBg,
+      border: transformedBorder
+    };
   }
 
   /**
@@ -259,14 +326,20 @@ export class DarkModeTheme extends Theme {
   }
 
   /**
+   * Gets the underlying theme
+   */
+  public getTheme(): Theme {
+    return this.theme;
+  }
+
+  /**
    * Converts to UiTheme with dark mode metadata
    */
   public toUiTheme() {
-    const uiTheme = super.toUiTheme();
+    const uiTheme = this.theme.toUiTheme();
     return {
       ...uiTheme,
       metadata: {
-        ...uiTheme.metadata,
         mode: 'dark' as const,
         lightThemeVersion: this.lightTheme.version
       }

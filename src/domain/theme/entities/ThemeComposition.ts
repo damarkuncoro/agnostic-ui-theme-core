@@ -7,12 +7,14 @@ import { BackgroundColor } from '../../tokens/color/BackgroundColor';
 import { BorderColor } from '../../tokens/color/BorderColor';
 import { SpacingScale } from '../../tokens/spacing/SpacingScale';
 import { TypographyScale } from '../../tokens/typography/TypographyScale';
+import type { ThemeExtension } from './ThemeExtension';
 
 /**
  * Theme Composition Entity
  * Enables theme inheritance, extension, and composition patterns
  */
-export class ThemeComposition extends Theme {
+export class ThemeComposition {
+  private theme: Theme;
   private baseThemes: Theme[];
   private extensions: ThemeExtension[];
 
@@ -20,21 +22,14 @@ export class ThemeComposition extends Theme {
     baseThemes: Theme[],
     extensions: ThemeExtension[] = []
   ) {
+    this.baseThemes = [...baseThemes];
+    this.extensions = [...extensions];
+
     // Merge base themes
     const mergedTheme = ThemeComposition.mergeThemes(baseThemes);
 
     // Apply extensions
-    const extendedTheme = ThemeComposition.applyExtensions(mergedTheme, extensions);
-
-    super({
-      version: extendedTheme.version,
-      color: extendedTheme.color,
-      spacing: extendedTheme.spacing,
-      typography: extendedTheme.typography
-    });
-
-    this.baseThemes = [...baseThemes];
-    this.extensions = [...extensions];
+    this.theme = ThemeComposition.applyExtensions(mergedTheme, extensions);
   }
 
   /**
@@ -181,18 +176,45 @@ export class ThemeComposition extends Theme {
 
     // Apply spacing overrides
     if (extension.spacing) {
+      const scale = extension.spacing.scale ? { ...theme.spacing.scale, ...extension.spacing.scale } : theme.spacing.scale;
+      const semantic = extension.spacing.semantic ? { ...theme.spacing.semantic, ...extension.spacing.semantic } : theme.spacing.semantic;
+
       themeData.spacing = SpacingScale.create({
-        scale: { ...theme.spacing.scale, ...extension.spacing.scale },
-        semantic: { ...theme.spacing.semantic, ...extension.spacing.semantic }
+        scale,
+        semantic
       });
     }
 
+    // Apply radius overrides (if supported by theme)
+    // Note: Radius is not part of the current Theme entity, so we skip it for now
+    // This could be extended in the future when radius is added to the Theme entity
+
     // Apply typography overrides
     if (extension.typography) {
+      const currentTypography = theme.typography;
+      const fontSize = extension.typography.fontSize
+        ? { ...currentTypography.fontSize, ...extension.typography.fontSize }
+        : currentTypography.fontSize;
+      const fontWeight = extension.typography?.fontWeight
+        ? Object.keys({ ...currentTypography.fontWeight, ...extension.typography.fontWeight })
+            .reduce((acc, key) => {
+              const currentValue = currentTypography.fontWeight[key];
+              const extensionValue = extension.typography?.fontWeight?.[key];
+              acc[key] = String(extensionValue !== undefined ? extensionValue : currentValue);
+              return acc;
+            }, {} as Record<string, string>)
+        : currentTypography.fontWeight;
+      const lineHeight = extension.typography.lineHeight
+        ? Object.fromEntries(
+            Object.entries({ ...currentTypography.lineHeight, ...extension.typography.lineHeight })
+              .map(([key, value]) => [key, String(value)])
+          )
+        : currentTypography.lineHeight;
+
       themeData.typography = TypographyScale.create({
-        fontSize: { ...theme.typography.fontSize, ...extension.typography.fontSize },
-        fontWeight: { ...theme.typography.fontWeight, ...extension.typography.fontWeight },
-        lineHeight: { ...theme.typography.lineHeight, ...extension.typography.lineHeight }
+        fontSize,
+        fontWeight,
+        lineHeight
       });
     }
 
@@ -228,14 +250,20 @@ export class ThemeComposition extends Theme {
   }
 
   /**
+   * Gets the underlying theme
+   */
+  public getTheme(): Theme {
+    return this.theme;
+  }
+
+  /**
    * Converts to UiTheme with composition metadata
    */
   public toUiTheme() {
-    const uiTheme = super.toUiTheme();
+    const uiTheme = this.theme.toUiTheme();
     return {
       ...uiTheme,
       metadata: {
-        ...uiTheme.metadata,
         composition: {
           baseThemeCount: this.baseThemes.length,
           extensionCount: this.extensions.length,
@@ -243,94 +271,5 @@ export class ThemeComposition extends Theme {
         }
       }
     };
-  }
-}
-
-/**
- * Theme Extension Interface
- * Defines properties that can be added or overridden in a theme
- */
-export interface ThemeExtension {
-  color?: {
-    palette?: Record<string, Record<string, string>>;
-    text?: Record<string, string>;
-    background?: Record<string, string>;
-    border?: Record<string, string>;
-  };
-  spacing?: {
-    scale?: Record<string, string>;
-    semantic?: Record<string, string>;
-  };
-  typography?: {
-    fontSize?: Record<string, string>;
-    fontWeight?: Record<string, string | number>;
-    lineHeight?: Record<string, string | number>;
-  };
-  metadata?: Record<string, any>;
-}
-
-/**
- * Theme Composition Builder
- * Fluent API for building complex theme compositions
- */
-export class ThemeCompositionBuilder {
-  private baseThemes: Theme[] = [];
-  private extensions: ThemeExtension[] = [];
-
-  /**
-   * Adds a base theme to the composition
-   */
-  public withBase(theme: Theme): ThemeCompositionBuilder {
-    this.baseThemes.push(theme);
-    return this;
-  }
-
-  /**
-   * Adds multiple base themes
-   */
-  public withBases(themes: Theme[]): ThemeCompositionBuilder {
-    this.baseThemes.push(...themes);
-    return this;
-  }
-
-  /**
-   * Adds an extension to customize the theme
-   */
-  public extend(extension: ThemeExtension): ThemeCompositionBuilder {
-    this.extensions.push(extension);
-    return this;
-  }
-
-  /**
-   * Builds the composed theme
-   */
-  public build(): ThemeComposition {
-    if (this.baseThemes.length === 0) {
-      throw new Error('At least one base theme is required');
-    }
-    return ThemeComposition.compose(this.baseThemes, this.extensions);
-  }
-
-  /**
-   * Creates a preset composition for common use cases
-   */
-  public static preset(name: string): ThemeCompositionBuilder {
-    const builder = new ThemeCompositionBuilder();
-
-    switch (name) {
-      case 'corporate':
-        // Add corporate theme composition logic
-        break;
-      case 'minimal':
-        // Add minimal theme composition logic
-        break;
-      case 'vibrant':
-        // Add vibrant theme composition logic
-        break;
-      default:
-        throw new Error(`Unknown preset: ${name}`);
-    }
-
-    return builder;
   }
 }

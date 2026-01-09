@@ -50,7 +50,7 @@ export class MergeThemesUseCase {
       const mergedTheme = ThemeComposition.compose(request.themes, request.extensions);
 
       // Validate the merged result
-      const finalValidation = await this.validator.validateTheme(mergedTheme);
+      const finalValidation = await this.validator.validateTheme(mergedTheme.getTheme());
       if (!finalValidation.isValid) {
         return {
           success: false,
@@ -66,7 +66,7 @@ export class MergeThemesUseCase {
         metadata: {
           sourceThemes: request.themes.length,
           appliedExtensions: request.extensions?.length || 0,
-          version: mergedTheme.version,
+          version: mergedTheme.getTheme().version,
           warnings: finalValidation.warnings
         }
       };
@@ -99,12 +99,12 @@ export class MergeThemesUseCase {
 
       // Generate preview data
       const preview = {
-        version: result.mergedTheme.version,
-        colorTokens: this.extractColorPreview(result.mergedTheme),
-        spacingTokens: this.extractSpacingPreview(result.mergedTheme),
-        typographyTokens: this.extractTypographyPreview(result.mergedTheme),
+        version: result.mergedTheme.getTheme().version,
+        colorTokens: this.extractColorPreview(result.mergedTheme.getTheme()),
+        spacingTokens: this.extractSpacingPreview(result.mergedTheme.getTheme()),
+        typographyTokens: this.extractTypographyPreview(result.mergedTheme.getTheme()),
         conflicts: this.detectConflicts(request.themes),
-        recommendations: this.generateRecommendations(request.themes, result.mergedTheme)
+        recommendations: this.generateRecommendations(request.themes, result.mergedTheme.getTheme())
       };
 
       return {
@@ -191,7 +191,7 @@ export class MergeThemesUseCase {
 
     for (const key of paletteKeys) {
       const values = themes
-        .map(theme => theme.color.palette.toObject()[key])
+        .map(theme => theme.color.palette.toObject()[key as keyof ReturnType<typeof theme.color.palette.toObject>])
         .filter(Boolean);
 
       if (values.length > 1) {
@@ -283,7 +283,7 @@ export interface MergeThemesRequest {
  */
 export interface MergeThemesResponse {
   success: boolean;
-  mergedTheme: Theme | null;
+  mergedTheme: ThemeComposition | null;
   error?: string;
   message?: string;
   metadata?: {
