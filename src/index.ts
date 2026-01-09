@@ -14,6 +14,9 @@ import './bootstrap'
 
 // Domain Layer
 export { Theme, UiThemeVersion } from './domain/theme/entities/Theme'
+export { DarkModeTheme } from './domain/theme/entities/DarkModeTheme'
+export { ThemeComposition, ThemeCompositionBuilder } from './domain/theme/entities/ThemeComposition'
+export type { ThemeExtension } from './domain/theme/entities/ThemeComposition'
 export { ColorPalette } from './domain/tokens/color/ColorPalette'
 export { TextColor } from './domain/tokens/color/TextColor'
 export { BackgroundColor } from './domain/tokens/color/BackgroundColor'
@@ -24,9 +27,19 @@ export { TypographyScale } from './domain/tokens/typography/TypographyScale'
 // Application Layer
 export { ThemeBuilderService } from './application/services/ThemeBuilderService'
 export { ThemeValidatorService } from './application/services/ThemeValidatorService'
+export { MergeThemesUseCase } from './application/use-cases/MergeThemesUseCase'
+export type {
+  MergeThemesRequest,
+  MergeThemesResponse,
+  MergePreviewResponse,
+  ThemeMergePreview
+} from './application/use-cases/MergeThemesUseCase'
 
 // Infrastructure Layer
 export { TokenBuilder } from './infrastructure/builders/TokenBuilder'
+export { ThemePerformanceService } from './infrastructure/services/ThemePerformanceService'
+export type { ThemePerformanceMetrics } from './infrastructure/services/ThemePerformanceService'
+export { ThemePresets, ThemePresetBuilder } from './infrastructure/templates/ThemePresets'
 
 // Dependency Injection
 export {
@@ -171,3 +184,111 @@ export function generateThemeReport(theme: UiTheme): string {
 
   return validator.generateValidationReport(domainTheme)
 }
+
+// =================================================================
+// ENHANCED UTILITY FUNCTIONS (New Advanced Features)
+// =================================================================
+
+/**
+ * Creates a dark mode version of a theme
+ */
+export function createDarkModeTheme(lightTheme: UiTheme, customizations?: any): UiTheme {
+  const domainTheme = Theme.create({
+    version: lightTheme.version,
+    color: {
+      palette: ColorPalette.create(lightTheme.tokens.color.palette as any),
+      text: TextColor.create(lightTheme.tokens.color.text as any),
+      background: BackgroundColor.create(lightTheme.tokens.color.background as any),
+      border: BorderColor.create(lightTheme.tokens.color.border as any)
+    },
+    spacing: SpacingScale.create(lightTheme.tokens.spacing),
+    typography: TypographyScale.create(lightTheme.tokens.typography)
+  });
+
+  const darkTheme = DarkModeTheme.fromLightTheme(domainTheme, customizations);
+  return darkTheme.toUiTheme();
+}
+
+/**
+ * Merges multiple themes into one
+ */
+export async function mergeThemes(themes: UiTheme[], options?: {
+  extensions?: any[];
+  forceMerge?: boolean;
+}): Promise<UiTheme> {
+  const mergeUseCase = new MergeThemesUseCase(getThemeValidatorService());
+
+  const domainThemes = themes.map(theme => Theme.create({
+    version: theme.version,
+    color: {
+      palette: ColorPalette.create(theme.tokens.color.palette as any),
+      text: TextColor.create(theme.tokens.color.text as any),
+      background: BackgroundColor.create(theme.tokens.color.background as any),
+      border: BorderColor.create(theme.tokens.color.border as any)
+    },
+    spacing: SpacingScale.create(theme.tokens.spacing),
+    typography: TypographyScale.create(theme.tokens.typography)
+  }));
+
+  const result = await mergeUseCase.execute({
+    themes: domainThemes,
+    extensions: options?.extensions,
+    forceMerge: options?.forceMerge
+  });
+
+  if (!result.success || !result.mergedTheme) {
+    throw new Error(result.message || 'Theme merge failed');
+  }
+
+  return result.mergedTheme.toUiTheme();
+}
+
+/**
+ * Creates a theme from a preset
+ */
+export function createThemeFromPreset(presetName: string, customizations?: any): UiTheme {
+  const preset = ThemePresets.createPreset(presetName);
+
+  if (customizations) {
+    const extended = ThemeComposition.extend(preset, customizations);
+    return extended.toUiTheme();
+  }
+
+  return preset.toUiTheme();
+}
+
+/**
+ * Monitors theme performance
+ */
+export const themePerformance = {
+  registerTheme: (theme: UiTheme, id?: string) => {
+    const performanceService = ThemePerformanceService.getInstance();
+    const domainTheme = Theme.create({
+      version: theme.version,
+      color: {
+        palette: ColorPalette.create(theme.tokens.color.palette as any),
+        text: TextColor.create(theme.tokens.color.text as any),
+        background: BackgroundColor.create(theme.tokens.color.background as any),
+        border: BorderColor.create(theme.tokens.color.border as any)
+      },
+      spacing: SpacingScale.create(theme.tokens.spacing),
+      typography: TypographyScale.create(theme.tokens.typography)
+    });
+    return performanceService.registerTheme(domainTheme, id);
+  },
+
+  recordRender: (themeId: string, renderTime: number) => {
+    const performanceService = ThemePerformanceService.getInstance();
+    performanceService.recordRender(themeId, renderTime);
+  },
+
+  getMetrics: (themeId: string) => {
+    const performanceService = ThemePerformanceService.getInstance();
+    return performanceService.getPerformanceMetrics(themeId);
+  },
+
+  getSummary: () => {
+    const performanceService = ThemePerformanceService.getInstance();
+    return performanceService.getPerformanceSummary();
+  }
+};
