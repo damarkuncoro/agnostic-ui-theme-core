@@ -156,7 +156,7 @@ export class ComponentTokenService {
     try {
       this.getTokensForComponent(theme, componentType as any);
     } catch (error) {
-      errors.push(`Component ${componentType}: ${error.message}`);
+      errors.push(`Component ${componentType}: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
 
     return { isValid: errors.length === 0, errors };

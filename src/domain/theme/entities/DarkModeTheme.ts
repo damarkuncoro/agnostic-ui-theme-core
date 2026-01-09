@@ -3,6 +3,7 @@
 import { Theme, UiThemeVersion } from './Theme';
 import { DarkModeThemeTransformer } from './ThemeTransformer';
 import { ThemeConverter } from './ThemeConverter';
+import { TypographyScale } from '../../tokens/typography/TypographyScale';
 
 /**
  * Dark Mode Theme Entity

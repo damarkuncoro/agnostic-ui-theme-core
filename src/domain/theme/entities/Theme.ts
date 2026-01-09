@@ -251,6 +251,10 @@ export class Theme {
       zIndex: Record<string, string>;
     };
   } {
-    return ThemeConverter.toUiTheme(this);
+    const result = ThemeConverter.toUiTheme(this);
+    return {
+      ...result,
+      version: result.version as UiThemeVersion
+    };
   }
 }

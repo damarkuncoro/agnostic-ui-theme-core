@@ -273,7 +273,7 @@ export class MergeThemesUseCase {
  */
 export interface MergeThemesRequest {
   themes: Theme[];
-  extensions?: import('../../domain/theme/entities/ThemeComposition').ThemeExtension[];
+  extensions?: import('../../domain/theme/entities/ThemeExtension').ThemeExtension[];
   forceMerge?: boolean;
   validateResult?: boolean;
 }

@@ -12,3 +12,6 @@ export type {
   MergePreviewResponse,
   ThemeMergePreview
 } from '../application/use-cases/MergeThemesUseCase'
+
+// Re-export for convenience in utilities
+export { MergeThemesUseCase as _MergeThemesUseCase } from '../application/use-cases/MergeThemesUseCase'

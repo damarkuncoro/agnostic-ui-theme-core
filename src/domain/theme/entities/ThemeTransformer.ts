@@ -2,6 +2,16 @@ import { Theme } from './Theme';
 import { DARK_MODE_TRANSFORMS } from './ThemeConstants';
 
 /**
+ * Transformed colors interface
+ */
+export interface TransformedColors {
+  palette: Record<string, Record<string, string>>;
+  text: Record<string, string>;
+  background: Record<string, string>;
+  border: Record<string, string>;
+}
+
+/**
  * Theme Transformer Base Class
  * Abstract base class for theme transformations
  * Follows Template Method pattern and SOLID principles
@@ -19,25 +29,15 @@ export abstract class ThemeTransformer {
   /**
    * Abstract method for color transformation logic
    */
-  protected abstract transformColors(theme: Theme): {
-    palette: Record<string, Record<string, string>>;
-    text: Record<string, string>;
-    background: Record<string, string>;
-    border: Record<string, string>;
-  };
+  protected abstract transformColors(theme: Theme): TransformedColors;
 
   /**
    * Hook method for merging overrides - can be overridden by subclasses
    */
   protected mergeOverrides(
-    transformedColors: {
-      palette: Record<string, Record<string, string>>;
-      text: Record<string, string>;
-      background: Record<string, string>;
-      border: Record<string, string>;
-    },
+    transformedColors: TransformedColors,
     overrides?: any
-  ): typeof transformedColors {
+  ): TransformedColors {
     if (!overrides?.color) return transformedColors;
 
     const result = { ...transformedColors };
@@ -94,12 +94,7 @@ export abstract class ThemeTransformer {
    */
   protected abstract createTransformedTheme(
     originalTheme: Theme,
-    transformedColors: {
-      palette: Record<string, Record<string, string>>;
-      text: Record<string, string>;
-      background: Record<string, string>;
-      border: Record<string, string>;
-    },
+    transformedColors: TransformedColors,
     overrides?: any
   ): Theme;
 

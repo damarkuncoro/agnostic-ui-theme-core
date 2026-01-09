@@ -3,7 +3,9 @@
 // High-level utility functions for common use cases
 // =================================================================
 
-import { Theme, DarkModeTheme, ThemeComposition, MergeThemesUseCase, ThemePresets } from './domain'
+import { Theme, DarkModeTheme, ThemeComposition } from './domain'
+import { MergeThemesUseCase } from './application'
+import { ThemePresets } from './infrastructure'
 import { getThemeBuilderService, getThemeValidatorService, getTokenBuilder } from '../bootstrap'
 
 // =================================================================
@@ -99,7 +101,11 @@ export function createDarkModeTheme(lightTheme: import('./legacy').UiTheme, cust
   });
 
   const darkTheme = DarkModeTheme.fromLightTheme(domainTheme, customizations);
-  return darkTheme.toUiTheme();
+  const result = darkTheme.toUiTheme();
+  return {
+    ...result,
+    version: result.version as import('./legacy').UiTheme['version']
+  };
 }
 
 /**
