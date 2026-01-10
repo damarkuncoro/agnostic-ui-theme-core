@@ -2,7 +2,421 @@
 
 ## 🚀 **Enterprise DDD Theme Management System**
 
-**Domain-Driven Design (DDD) + DRY + SOLID Architecture** for comprehensive theme management. This package provides **enterprise-grade theme orchestration** with rich domain models, comprehensive validation, and extensible token systems.
+**Domain-Driven Design (DDD) + DRY + SOLID Architecture** untuk manajemen tema komprehensif. Package ini menyediakan **orkestrasi tema enterprise-grade** dengan domain models yang rich, validasi komprehensif, dan sistem token yang extensible.
+
+## 🎯 **Cara Kerja Theme-Core System**
+
+### **🔄 Theme Creation Process**
+
+```mermaid
+graph TD
+    A[User Request] --> B[ThemeFactory.create()]
+    B --> C[Theme Constructor]
+    C --> D[Initialize Token VOs]
+    D --> E[Setup Business Logic]
+    E --> F[Validate Invariants]
+    F --> G[Return Theme Entity]
+
+    H[Theme.createDefault()] --> I[ThemeFactory.createDefault()]
+    I --> J[Load Default Tokens]
+    J --> K[Create Token VOs]
+    K --> L[Build Theme Entity]
+```
+
+### **🏗️ Theme Construction Flow**
+
+1. **Factory Pattern Application**
+   ```typescript
+   // Static factory method
+   const theme = Theme.create({
+     version: "2.1",
+     color: { /* tokens */ },
+     spacing: { /* tokens */ },
+     typography: { /* tokens */ }
+   });
+   ```
+
+2. **Token Value Object Creation**
+   ```typescript
+   // Immutable value objects dengan validasi
+   const palette = ColorPalette.create({
+     neutral: { 50: "#f9fafb", 500: "#6b7280" },
+     primary: { 500: "#3b82f6" }
+   });
+   ```
+
+3. **Business Logic Encapsulation**
+   ```typescript
+   // Domain rules di-encapsulate dalam entity
+   class Theme {
+     supportsDarkMode(): boolean {
+       // Business logic untuk dark mode detection
+       return this.color.text.inverse !== this.color.text.primary;
+     }
+   }
+   ```
+
+### **🎨 Token System Architecture**
+
+#### **Color Domain Process**
+```typescript
+// 1. Raw token input
+const colorTokens = {
+  palette: { primary: { 500: "#3b82f6" } },
+  text: { primary: "#1f2937" },
+  background: { surface: "#ffffff" }
+};
+
+// 2. Value Object Creation dengan Validasi
+const palette = ColorPalette.create(colorTokens.palette);
+const textColor = TextColor.create(colorTokens.text);
+const background = BackgroundColor.create(colorTokens.background);
+
+// 3. Business Rules Application
+const isAccessible = textColor.validateContrast().isValid;
+const hierarchyValid = background.validateHierarchy().isValid;
+```
+
+#### **Spacing Domain Process**
+```typescript
+// 1. Scale definition
+const spacingTokens = {
+  scale: { 4: "1rem", 8: "2rem", 16: "4rem" },
+  semantic: { sm: "0.5rem", md: "1rem", lg: "2rem" }
+};
+
+// 2. Value Object dengan progression validation
+const spacing = SpacingScale.create(spacingTokens);
+
+// 3. Business validation
+const isValid = spacing.validateProgression().isValid;
+```
+
+### **🔧 Application Services Workflow**
+
+#### **ThemeBuilderService Process**
+```typescript
+class ThemeBuilderService {
+  buildTheme(config: ThemeCreationConfig): Theme {
+    // 1. Token generation menggunakan DRY builders
+    const tokens = this.generateTokens(config);
+
+    // 2. Domain object construction
+    const theme = ThemeFactory.create(tokens);
+
+    // 3. Business rule validation
+    this.validateBusinessRules(theme);
+
+    return theme;
+  }
+}
+```
+
+#### **ThemeValidatorService Process**
+```typescript
+class ThemeValidatorService {
+  validateTheme(theme: Theme): ValidationResult {
+    // 1. Structural validation
+    const structure = this.validateStructure(theme);
+
+    // 2. Accessibility validation
+    const accessibility = theme.validateAccessibility();
+
+    // 3. Business rule validation
+    const business = this.validateBusinessRules(theme);
+
+    return {
+      isValid: structure.isValid && accessibility.isAccessible && business.isValid,
+      isAccessible: accessibility.isAccessible,
+      errors: [...structure.errors, ...business.errors],
+      warnings: [...accessibility.violations, ...business.warnings]
+    };
+  }
+}
+```
+
+## 🏭 **Factory Pattern Implementation**
+
+### **ThemeFactory Process**
+```typescript
+class ThemeFactory {
+  static create(props: ThemeTokenStructure): Theme {
+    // 1. Bypassing private constructor (Factory pattern)
+    const theme = Object.create(Theme.prototype);
+
+    // 2. Setting readonly properties
+    Object.defineProperty(theme, 'version', { value: props.version });
+    Object.defineProperty(theme, 'color', { value: props.color });
+    Object.defineProperty(theme, 'spacing', { value: props.spacing });
+    Object.defineProperty(theme, 'typography', { value: props.typography });
+
+    // 3. Initializing composed dependencies
+    theme.validator = new ThemeValidator();
+    theme.businessLogic = ThemeBusinessLogic;
+    theme.operations = ThemeOperations;
+
+    return theme;
+  }
+
+  static createDefault(): Theme {
+    // DRY: Centralized default token generation
+    return this.create({
+      version: "2.1",
+      color: {
+        palette: ColorPalette.createDefault(),
+        text: TextColor.createDefault(),
+        background: BackgroundColor.createDefault(),
+        border: BorderColor.createDefault()
+      },
+      spacing: SpacingScale.createDefault(),
+      typography: TypographyScale.createDefault()
+    });
+  }
+}
+```
+
+## 🎨 **Domain Entity Operations**
+
+### **Theme Entity Business Logic**
+```typescript
+class Theme {
+  // Business method dengan domain logic
+  getTokensForComponent(component: string): ComponentTokens {
+    return this.businessLogic.getTokensForComponent(this, component);
+  }
+
+  // Invariant enforcement
+  with(updates: ThemeUpdateProps): Theme {
+    return this.operations.with(this, updates); // Immutable
+  }
+
+  // Domain validation
+  validate(): ValidationResult {
+    return this.validator.validateTheme(this);
+  }
+}
+```
+
+### **Composition Pattern Usage**
+```typescript
+class Theme {
+  constructor() {
+    // Delegate responsibilities ke specialized classes
+    this.validator = new ThemeValidator();        // Validation logic
+    this.businessLogic = ThemeBusinessLogic;      // Business rules
+    this.operations = ThemeOperations;            // Data operations
+  }
+}
+```
+
+## 📊 **Token Value Objects Process**
+
+### **ColorPalette VO Process**
+```typescript
+class ColorPalette {
+  private constructor(props: ColorPaletteProps) {
+    // Immutable state
+    this.neutral = Object.freeze(props.neutral);
+    this.primary = Object.freeze(props.primary);
+  }
+
+  static create(props: ColorPaletteProps): ColorPalette {
+    // Validation logic
+    this.validateColors(props);
+    return new ColorPalette(props);
+  }
+
+  // Business methods
+  getNeutral(shade: string): string {
+    return this.neutral[shade] || this.neutral[500];
+  }
+}
+```
+
+### **Validation Process**
+```typescript
+static validateColors(props: ColorPaletteProps): void {
+  const hexRegex = /^#[0-9a-fA-F]{6}$/;
+
+  Object.values(props.neutral).forEach(color => {
+    if (!hexRegex.test(color)) {
+      throw new Error(`Invalid neutral color: ${color}`);
+    }
+  });
+}
+```
+
+## 🔄 **Dependency Injection Container**
+
+### **Bootstrap Process**
+```typescript
+// Singleton pattern untuk services
+let themeBuilderServiceInstance: ThemeBuilderService | null = null;
+
+export function getThemeBuilderService(): ThemeBuilderService {
+  if (!themeBuilderServiceInstance) {
+    themeBuilderServiceInstance = new ThemeBuilderService();
+  }
+  return themeBuilderServiceInstance;
+}
+```
+
+## 🎯 **Business Rules Implementation**
+
+### **Accessibility Validation**
+```typescript
+// Domain service dengan business logic
+export class ThemeBusinessLogic {
+  static supportsDarkMode(theme: Theme): boolean {
+    // Business rule: Theme supports dark mode if it has
+    // appropriate inverse colors for accessibility
+    return theme.color.text.inverse !== theme.color.text.primary &&
+           theme.color.background.inverse !== theme.color.background.surface;
+  }
+}
+```
+
+### **Component Token Resolution**
+```typescript
+static getTokensForComponent(theme: Theme, component: string): ComponentTokens {
+  // Business logic untuk component-specific tokens
+  const componentConfigs = {
+    button: {
+      colors: { primary: 'palette.primary.500', text: 'text.primary' },
+      spacing: { padding: 'spacing.md' }
+    }
+  };
+
+  const config = componentConfigs[component];
+  return this.resolveTokens(theme, config);
+}
+```
+
+## 📈 **Performance & Memory Management**
+
+### **Immutability Pattern**
+```typescript
+class Theme {
+  with(updates: ThemeUpdateProps): Theme {
+    // Always return new instance (immutable)
+    return ThemeFactory.create({
+      ...this,
+      ...updates
+    });
+  }
+}
+```
+
+### **Lazy Loading (Future Enhancement)**
+```typescript
+class Theme {
+  private _complexityScore?: number;
+
+  getComplexityScore(): number {
+    // Lazy calculation dengan caching
+    if (this._complexityScore === undefined) {
+      this._complexityScore = this.calculateComplexity();
+    }
+    return this._complexityScore;
+  }
+}
+```
+
+## 🧪 **Testing Strategy**
+
+### **Unit Testing Process**
+```typescript
+describe('Theme', () => {
+  it('should create valid theme', () => {
+    const theme = Theme.createDefault();
+
+    expect(theme.version).toBe('2.1');
+    expect(theme.validate().isValid).toBe(true);
+  });
+
+  it('should enforce business rules', () => {
+    const theme = Theme.createDefault();
+
+    expect(theme.supportsDarkMode()).toBe(true);
+    expect(theme.getComplexityScore()).toBeGreaterThan(0);
+  });
+});
+```
+
+### **Integration Testing**
+```typescript
+describe('ThemeFactory', () => {
+  it('should create theme with valid tokens', () => {
+    const theme = ThemeFactory.createDefault();
+
+    expect(theme.color.palette).toBeInstanceOf(ColorPalette);
+    expect(theme.spacing).toBeInstanceOf(SpacingScale);
+  });
+});
+```
+
+## 🚀 **Advanced Usage Patterns**
+
+### **Theme Extension**
+```typescript
+const baseTheme = Theme.createDefault();
+const extendedTheme = baseTheme.with({
+  color: {
+    palette: {
+      primary: { 500: '#6366f1' } // Custom primary
+    }
+  }
+});
+```
+
+### **Theme Validation**
+```typescript
+const theme = Theme.create(customTokens);
+const validation = theme.validate();
+
+if (!validation.isValid) {
+  console.error('Theme validation failed:', validation.errors);
+}
+```
+
+### **Component Integration**
+```typescript
+const theme = Theme.createDefault();
+const buttonTokens = theme.getTokensForComponent('button');
+// → { colors: {...}, spacing: {...}, typography: {...} }
+```
+
+## 📋 **Architecture Benefits Achieved**
+
+| Benefit | Implementation | Result |
+|---------|----------------|---------|
+| **SOLID Compliance** | Single responsibility classes | ✅ Maintainable |
+| **DRY Principle** | Centralized token builders | ✅ No duplication |
+| **DDD Patterns** | Rich domain entities | ✅ Business-focused |
+| **Type Safety** | Full TypeScript coverage | ✅ Compile-time validation |
+| **Testability** | Dependency injection | ✅ Comprehensive testing |
+| **Immutability** | Value objects pattern | ✅ Predictable state |
+| **Performance** | Lazy loading potential | ✅ Efficient |
+| **Extensibility** | Plugin architecture | ✅ Future-proof |
+
+---
+
+## 🎯 **Kesimpulan**
+
+**Theme-Core Package** adalah **foundation yang solid** untuk sistem tema Agnostic UI dengan:
+
+- ✅ **DDD Architecture**: Domain entities dengan business logic encapsulation
+- ✅ **SOLID Principles**: Semua 5 prinsip diimplementasikan dengan sempurna
+- ✅ **DRY Compliance**: Zero code duplication melalui centralized builders
+- ✅ **Token System**: Rich value objects dengan validation dan business rules
+- ✅ **Factory Pattern**: Clean object construction dengan proper encapsulation
+- ✅ **Composition**: Specialized classes untuk different responsibilities
+- ✅ **Validation**: Comprehensive accessibility dan structural validation
+- ✅ **Immutability**: Predictable state management dengan value objects
+- ✅ **Type Safety**: Full TypeScript dengan domain-specific types
+- ✅ **Testability**: Dependency injection enabled comprehensive testing
+
+**🏛️ Enterprise-grade theme management dengan DDD excellence! 🚀✨**
 
 ## ✨ **DDD Architecture Excellence**
 
