@@ -3,6 +3,10 @@
 // Deprecated exports for backward compatibility
 // =================================================================
 
+import { Theme } from '../domain/theme/entities/Theme'
+import { Theme as ThemeDomain, ColorPalette, TextColor, BackgroundColor, BorderColor, SpacingScale, TypographyScale } from '../exports/domain'
+import { getThemeValidatorService } from '../bootstrap'
+
 // Legacy theme interface (now powered by DDD)
 export interface UiTheme {
   version: import('./domain').UiThemeVersion
@@ -29,17 +33,13 @@ export interface UiTheme {
 
 // Legacy defaults (now generated from DDD)
 export const themeCore: UiTheme = (() => {
-  const { Theme } = require('../domain/theme/entities/Theme')
   const theme = Theme.createDefault()
   return theme.toUiTheme()
 })()
 
 // Legacy validation function (now uses DDD validator)
 export function validateTheme(theme: UiTheme): void {
-  const { Theme, ColorPalette, TextColor, BackgroundColor, BorderColor, SpacingScale, TypographyScale } = require('../exports/domain')
-  const { getThemeValidatorService } = require('../bootstrap')
-
-  const domainTheme = Theme.create({
+  const domainTheme = ThemeDomain.create({
     version: theme.version,
     color: {
       palette: ColorPalette.create(theme.tokens.color.palette as any),

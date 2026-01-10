@@ -29,10 +29,10 @@ export class Theme {
 
   // Composition: Delegate responsibilities to specialized classes
   private validator: ThemeValidator;
-  private businessLogic: ThemeBusinessLogic;
-  private operations: ThemeOperations;
+  private businessLogic: typeof ThemeBusinessLogic;
+  private operations: typeof ThemeOperations;
 
-  private constructor(props: ThemeTokenStructure) {
+  public constructor(props: ThemeTokenStructure) {
     this.version = props.version;
     this.color = Object.freeze({
       palette: props.color.palette,
